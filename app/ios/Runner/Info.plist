@@ -52,5 +52,12 @@
 
   <key>NSLocationAlwaysUsageDescription</key>
   <string>TapMap benötigt deinen Standort auch im Hintergrund, um dich über Trinkbrunnen in deiner Nähe zu informieren.</string>
+
+  <key>NSCameraUsageDescription</key>
+  <string>TapMap benötigt Zugriff auf die Kamera, um Fotos von Trinkbrunnen aufzunehmen.</string>
+
+  <key>NSPhotoLibraryUsageDescription</key>
+  <string>TapMap benötigt Zugriff auf die Fotobibliothek.</string>
+
 </dict>
 </plist>

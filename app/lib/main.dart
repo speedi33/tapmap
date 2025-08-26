@@ -1,10 +1,20 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_map/flutter_map.dart';
+import 'package:hive_flutter/hive_flutter.dart';
 import 'package:latlong2/latlong.dart';
-import 'features/location/location_provider.dart';
+import 'features/taps/tap_form.dart';
+import 'features/taps/tap_provider.dart';
+import 'features/taps/tap.dart';
+import 'widgets/map_view.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Hive.initFlutter();
+
+  Hive.registerAdapter(TapAdapter());
+
+  await Hive.openBox<Tap>('taps');
+
   runApp(const ProviderScope(child: TapMapApp()));
 }
 
@@ -26,51 +36,23 @@ class MapPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final location = ref.watch(locationProvider);
+    final taps = ref.watch(tapsProvider);
 
     return Scaffold(
-      appBar: AppBar(title: const Text("TapMap")),
-      body: location.when(
-        data: (pos) {
-          if (pos == null) {
-            return const Center(child: Text("Standort nicht verfügbar"));
-          }
-
-          final userLatLng = LatLng(pos.latitude, pos.longitude);
-
-          return FlutterMap(
-            options: MapOptions(initialCenter: userLatLng, initialZoom: 15),
-            children: [
-              TileLayer(
-                urlTemplate:
-                    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-                subdomains: const ['a', 'b', 'c'],
-              ),
-              MarkerLayer(
-                markers: [
-                  Marker(
-                    point: userLatLng,
-                    width: 40,
-                    height: 40,
-                    child: const Icon(
-                      Icons.location_pin,
-                      color: Colors.red,
-                      size: 40,
-                    ),
-                  ),
-                ],
-              ),
-            ],
+      appBar: AppBar(title: const Text('TapMap')),
+      body: MapView(
+        taps: taps,
+        onTap: (LatLng position) {
+          showModalBottomSheet(
+            context: context,
+            builder: (_) => TapForm(
+              initialPosition: position,
+              onSave: (tap) {
+                ref.read(tapsProvider.notifier).addTap(tap);
+              },
+            ),
           );
         },
-        loading: () => const Center(child: CircularProgressIndicator()),
-        error: (e, _) => Center(child: Text("Fehler: $e")),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Platzhalter für Brunnen hinzufügen
-        },
-        child: const Icon(Icons.add_location_alt),
       ),
     );
   }
