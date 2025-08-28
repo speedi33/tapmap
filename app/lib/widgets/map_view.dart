@@ -3,7 +3,7 @@ import 'package:flutter_map/flutter_map.dart';
 import 'package:latlong2/latlong.dart';
 
 import '../features/taps/tap.dart';
-import '../features/taps/tap_details.dart';
+import '../features/taps/tap_detail_sheet.dart';
 
 typedef TapCallback = void Function(LatLng position);
 
@@ -41,7 +41,13 @@ class MapView extends StatelessWidget {
                 onTap: () {
                   showModalBottomSheet(
                     context: context,
-                    builder: (_) => TapDetail(tap: tap),
+                    isScrollControlled: true,
+                    shape: const RoundedRectangleBorder(
+                      borderRadius: BorderRadius.vertical(
+                        top: Radius.circular(16),
+                      ),
+                    ),
+                    builder: (_) => TapDetailSheet(tap: tap),
                   );
                 },
                 child: const Icon(
